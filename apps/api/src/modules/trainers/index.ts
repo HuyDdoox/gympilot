@@ -1,0 +1,2 @@
+﻿// trainers module placeholder
+export {};

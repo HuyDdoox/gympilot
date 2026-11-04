@@ -1,0 +1,2 @@
+﻿// bookings module placeholder
+export {};

@@ -1,0 +1,252 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  STAFF
+  TRAINER
+  MEMBER
+}
+
+enum MemberStatus {
+  ACTIVE
+  PAUSED
+  EXPIRED
+  CANCELLED
+}
+
+enum PlanType {
+  MONTHLY
+  QUARTERLY
+  SESSION_PACK
+  DROP_IN
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum BookingStatus {
+  BOOKED
+  ATTENDED
+  CANCELLED
+  WAITLISTED
+}
+
+enum CheckInMethod {
+  QR
+  STAFF
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  CASH
+  MOMO
+  VNPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum NotificationType {
+  CLASS_REMINDER
+  MEMBERSHIP_EXPIRING
+  SESSIONS_LOW
+  PAYMENT_REMINDER
+  BOOKING_CONFIRMATION
+}
+
+model Gym {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  phone     String?
+  logoUrl   String?
+  openTime  String?
+  closeTime String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users    User[]
+  members  Member[]
+  trainers Trainer[]
+  plans    Plan[]
+  classes  GymClass[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  gymId        String
+  gym          Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phone        String?
+  role         Role
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  member  Member?
+  trainer Trainer?
+}
+
+model Member {
+  id          String       @id @default(cuid())
+  userId      String       @unique
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gymId       String
+  gym         Gym          @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  dateOfBirth DateTime?
+  gender      String?
+  notes       String?
+  status      MemberStatus @default(ACTIVE)
+  qrToken     String       @unique @default(cuid())
+  joinedAt    DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  memberships   Membership[]
+  bookings      Booking[]
+  checkIns      CheckIn[]
+  notifications Notification[]
+}
+
+model Trainer {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gymId     String
+  gym       Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  specialty String?
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  classSessions ClassSession[]
+}
+
+model Plan {
+  id            String   @id @default(cuid())
+  gymId         String
+  gym           Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  name          String
+  type          PlanType
+  price         Int
+  durationDays  Int?
+  totalSessions Int?
+  description   String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  memberships Membership[]
+}
+
+model Membership {
+  id           String           @id @default(cuid())
+  memberId     String
+  member       Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  planId       String
+  plan         Plan             @relation(fields: [planId], references: [id])
+  startDate    DateTime
+  endDate      DateTime?
+  sessionsLeft Int?
+  status       MembershipStatus @default(ACTIVE)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  payments Payment[]
+}
+
+model GymClass {
+  id              String   @id @default(cuid())
+  gymId           String
+  gym             Gym      @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  capacity        Int
+  durationMin     Int      @default(60)
+  requiresSession Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sessions ClassSession[]
+}
+
+model ClassSession {
+  id          String    @id @default(cuid())
+  classId     String
+  gymClass    GymClass  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  trainerId   String?
+  trainer     Trainer?  @relation(fields: [trainerId], references: [id])
+  startsAt    DateTime
+  endsAt      DateTime
+  capacity    Int
+  bookedCount Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  bookings Booking[]
+}
+
+model Booking {
+  id           String        @id @default(cuid())
+  memberId     String
+  member       Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  sessionId    String
+  classSession ClassSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  status       BookingStatus @default(BOOKED)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([memberId, sessionId])
+}
+
+model CheckIn {
+  id        String        @id @default(cuid())
+  memberId  String
+  member    Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  method    CheckInMethod
+  note      String?
+  createdAt DateTime      @default(now())
+
+  @@unique([memberId, createdAt])
+}
+
+model Payment {
+  id           String        @id @default(cuid())
+  membershipId String?
+  membership   Membership?   @relation(fields: [membershipId], references: [id])
+  amount       Int
+  method       PaymentMethod
+  status       PaymentStatus @default(PENDING)
+  paidAt       DateTime?
+  createdById  String
+  note         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  memberId  String
+  member    Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  content   String
+  isRead    Boolean          @default(false)
+  sentAt    DateTime         @default(now())
+}
