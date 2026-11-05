@@ -20,3 +20,4 @@
 15. Không tự ý thêm tính năng ngoài PROJECT_BRIEF.md.
 16. Khi thay đổi schema, phải tạo Prisma migration và cập nhật seed.
 17. Commit theo dạng: `feat(module): mô tả ngắn`.
+18. Mọi việc được giao cho ai làm phải được duyệt mới làm.
