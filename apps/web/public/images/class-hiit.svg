@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 220" width="350" height="220">
+  <defs>
+    <linearGradient id="hiitBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="fire" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="350" height="220" fill="url(#hiitBg)"/>
+  <!-- Battle Ropes Wave Graphic -->
+  <path d="M 30 150 Q 80 80 130 150 T 230 150 T 320 150" fill="none" stroke="#22c55e" stroke-width="6" opacity="0.8"/>
+  <path d="M 30 160 Q 80 90 130 160 T 230 160 T 320 160" fill="none" stroke="#eab308" stroke-width="4" opacity="0.6"/>
+  <!-- Workout athlete silhouette with battle ropes -->
+  <g transform="translate(130, 45)">
+    <circle cx="45" cy="20" r="14" fill="#f8fafc"/>
+    <path d="M 40 35 L 50 35 L 58 85 L 32 85 Z" fill="#94a3b8"/>
+    <!-- Squat Legs -->
+    <path d="M 35 85 L 15 110 L 20 135" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <path d="M 55 85 L 75 110 L 70 135" stroke="#cbd5e1" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <!-- Arms swinging ropes -->
+    <path d="M 38 45 L 10 75" stroke="#f8fafc" stroke-width="6" stroke-linecap="round"/>
+    <path d="M 52 45 L 80 75" stroke="#f8fafc" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <!-- Floor lighting -->
+  <rect y="210" width="350" height="10" fill="url(#fire)" opacity="0.6"/>
+</svg>

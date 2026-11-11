@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dumbbell, Activity, CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Dumbbell, Activity, CheckCircle2, ShieldCheck, Zap, ArrowRight, LogIn } from 'lucide-react';
 
 export const App: React.FC = () => {
   return (
@@ -19,9 +20,18 @@ export const App: React.FC = () => {
             </span>
           </div>
         </div>
-        <div className="flex items-center space-x-2 text-sm text-slate-300">
-          <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
-          <span>Hệ thống đang hoạt động</span>
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center space-x-2 text-sm text-slate-300">
+            <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <span>Hệ thống đang hoạt động</span>
+          </div>
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium border border-slate-700 transition-colors"
+          >
+            <LogIn className="w-4 h-4 text-emerald-400" />
+            <span>Đăng nhập</span>
+          </Link>
         </div>
       </header>
 
@@ -29,15 +39,39 @@ export const App: React.FC = () => {
       <main className="max-w-4xl w-full mx-auto my-auto text-center py-12">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 text-sm mb-6">
           <Zap className="w-4 h-4 text-emerald-400" />
-          <span>Khởi tạo dự án thành công (Task 1 — P0)</span>
+          <span>Sprint 1: Frontend Setup &amp; Design System Hoàn Thiện</span>
         </div>
 
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
           GymPilot đang khởi tạo
         </h1>
-        <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-8 leading-relaxed">
           Giải pháp tinh gọn all-in-one quản lý hội viên, gói tập, lịch lớp, QR check-in và doanh thu cho phòng gym, yoga và pilates boutique.
         </p>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold shadow-lg shadow-emerald-500/20 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          >
+            <span>Đăng nhập hệ thống</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            to="/member/dashboard"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 font-semibold border border-emerald-500/40 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow-lg shadow-emerald-950/40"
+          >
+            <span>Trang chủ Hội viên (Demo)</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            to="/owner/dashboard"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-semibold border border-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-slate-400"
+          >
+            <span>Khu vực Quản trị (Portal)</span>
+          </Link>
+        </div>
 
         {/* Feature Highlights Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
@@ -59,9 +93,9 @@ export const App: React.FC = () => {
 
           <div className="bg-slate-800/50 border border-slate-700/70 rounded-2xl p-6 backdrop-blur-sm">
             <Activity className="w-6 h-6 text-amber-400 mb-3" />
-            <h3 className="text-lg font-semibold mb-1">Sẵn sàng vận hành</h3>
+            <h3 className="text-lg font-semibold mb-1">UI System &amp; Routing</h3>
             <p className="text-sm text-slate-400">
-              Docker PostgreSQL 16, Prisma ORM với 11 models và RESTful health check endpoint.
+              Design tokens, Layout Shell responsive và bộ UI components chuẩn hóa toàn diện.
             </p>
           </div>
         </div>
