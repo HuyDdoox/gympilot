@@ -1,0 +1,211 @@
+<mxfile host="app.diagrams.net" modified="2026-11-05T23:45:00.000Z" agent="GymPilot AI" version="24.0.0" type="device">
+  <diagram id="page_usecase" name="Use Case - GymPilot System">
+    <mxGraphModel dx="1600" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" background="#000000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      <mxCell id="sys_boundary" value="Hệ thống Quản lý Phòng Gym (GymPilot)" style="swimlane;startSize=40;fontStyle=1;align=center;html=1;fillColor=#121212;fontColor=#ffffff;strokeColor=#ffffff;strokeWidth=1.5;rounded=0;fontSize=16;" vertex="1" parent="1">
+        <mxGeometry x="190" y="40" width="1020" height="880" as="geometry" />
+      </mxCell>
+      <mxCell id="act_member" value="Hội viên\n(Member)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=none;strokeColor=#ffffff;strokeWidth=1.5;fontColor=#ffffff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+        <mxGeometry x="60" y="220" width="50" height="90" as="geometry" />
+      </mxCell>
+      <mxCell id="act_trainer" value="Huấn luyện viên\n(Trainer)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=none;strokeColor=#ffffff;strokeWidth=1.5;fontColor=#ffffff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+        <mxGeometry x="60" y="680" width="50" height="90" as="geometry" />
+      </mxCell>
+      <mxCell id="act_staff" value="Nhân viên / Lễ tân\n(Staff)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=none;strokeColor=#ffffff;strokeWidth=1.5;fontColor=#ffffff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+        <mxGeometry x="1250" y="220" width="50" height="90" as="geometry" />
+      </mxCell>
+      <mxCell id="act_owner" value="Chủ phòng gym\n(Owner)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=none;strokeColor=#ffffff;strokeWidth=1.5;fontColor=#ffffff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+        <mxGeometry x="1250" y="680" width="50" height="90" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_login" value="Đăng nhập" style="ellipse;whiteSpace=wrap;html=1;fillColor=#083338;strokeColor=#26c6da;strokeWidth=2;fontColor=#ffffff;fontStyle=1;fontSize=13;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="440" y="410" width="140" height="60" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_view_info" value="Xem thông tin phòng gym" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="40" y="70" width="170" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_register" value="Đăng ký tài khoản hội viên" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="40" y="130" width="170" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_view_qr" value="Xem mã QR cá nhân" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="40" y="190" width="170" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_book_class" value="Đặt lớp học (Book class)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="230" y="150" width="170" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_cancel_book" value="Hủy đặt lớp" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="230" y="220" width="160" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_history" value="Xem lịch sử check-in &amp; gói tập" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="40" y="270" width="180" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_notifications" value="Nhận thông báo nhắc lịch / gia hạn" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="40" y="340" width="190" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_view_sessions" value="Xem lịch dạy được phân công" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="40" y="620" width="180" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_view_students" value="Xem danh sách học viên lớp" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="230" y="660" width="170" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_attendance" value="Điểm danh học viên tại lớp" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="40" y="720" width="180" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_qr_checkin" value="Quét mã QR check-in hội viên" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="810" y="70" width="180" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_manual_checkin" value="Check-in thủ công &amp; Trừ buổi" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="610" y="120" width="180" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_member_mgmt" value="Thêm mới &amp; Quản lý hội viên" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="810" y="150" width="180" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_sell_package" value="Bán gói tập cho hội viên" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="610" y="200" width="170" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_payment" value="Xác nhận thanh toán (Payment)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="810" y="230" width="180" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_import_csv" value="Import hội viên từ Excel/CSV" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="610" y="280" width="180" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_gym_config" value="Cấu hình thông tin phòng gym" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="810" y="610" width="180" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_plan_mgmt" value="Quản lý danh mục gói tập (Plans)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="610" y="650" width="190" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_schedule_mgmt" value="Quản lý lịch lớp &amp; Phân công HLV" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="810" y="690" width="190" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_staff_mgmt" value="Quản lý tài khoản nhân viên / HLV" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="610" y="740" width="190" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="uc_dashboard" value="Xem Dashboard &amp; Báo cáo doanh thu" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0a363d;strokeColor=#1fb69d;strokeWidth=1.5;fontColor=#ffffff;fontSize=11;" vertex="1" parent="sys_boundary">
+        <mxGeometry x="810" y="770" width="195" height="42" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_0" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_member" target="uc_view_info">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_1" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_member" target="uc_register">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_2" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_member" target="uc_view_qr">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_3" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_member" target="uc_book_class">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_4" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_member" target="uc_cancel_book">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_5" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_member" target="uc_history">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_6" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_member" target="uc_notifications">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_7" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_trainer" target="uc_view_sessions">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_8" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_trainer" target="uc_view_students">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_9" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_trainer" target="uc_attendance">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_10" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_staff" target="uc_qr_checkin">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_11" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_staff" target="uc_manual_checkin">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_12" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_staff" target="uc_member_mgmt">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_13" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_staff" target="uc_sell_package">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_14" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_staff" target="uc_payment">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_15" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_staff" target="uc_import_csv">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_16" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_owner" target="uc_gym_config">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_17" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_owner" target="uc_plan_mgmt">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_18" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_owner" target="uc_schedule_mgmt">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_19" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_owner" target="uc_staff_mgmt">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="actor_link_20" style="endArrow=none;html=1;strokeColor=#71717a;strokeWidth=1.2;" edge="1" parent="1" source="act_owner" target="uc_dashboard">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_0" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_view_qr" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_1" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_book_class" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_2" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_cancel_book" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_3" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_history" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_4" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_notifications" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_5" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_view_sessions" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_6" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_view_students" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_7" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_attendance" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_8" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_qr_checkin" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_9" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_manual_checkin" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_10" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_member_mgmt" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_11" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_sell_package" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_12" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_payment" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_13" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_import_csv" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_14" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_gym_config" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_15" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_plan_mgmt" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_16" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_schedule_mgmt" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_17" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_staff_mgmt" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      <mxCell id="inc_18" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="endArrow=open;endSize=8;dashed=1;html=1;strokeColor=#a1a1aa;strokeWidth=1;fontColor=#e4e4e7;fontSize=8;align=center;verticalAlign=bottom;" edge="1" parent="sys_boundary" source="uc_dashboard" target="uc_login">
+        <mxGeometry relative="1" as="geometry" />
+      </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
