@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="300" height="200">
+  <defs>
+    <linearGradient id="yogaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ecfdf5"/>
+      <stop offset="100%" stop-color="#d1fae5"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="200" fill="url(#yogaBg)"/>
+  <!-- Floor line -->
+  <line x1="20" y1="165" x2="280" y2="165" stroke="#a7f3d0" stroke-width="3" stroke-linecap="round"/>
+  <!-- Yoga mat -->
+  <rect x="40" y="160" width="220" height="6" rx="3" fill="#059669"/>
+  <!-- Yoga silhouette figure (Warrior / Dancer Pose) -->
+  <g transform="translate(100, 35)">
+    <!-- Head -->
+    <circle cx="50" cy="20" r="12" fill="#047857"/>
+    <!-- Body -->
+    <path d="M 45 32 Q 40 70 52 95 Q 60 70 55 32 Z" fill="#065f46"/>
+    <!-- Left Leg straight standing -->
+    <path d="M 50 95 L 48 130" stroke="#065f46" stroke-width="8" stroke-linecap="round"/>
+    <!-- Right Leg extended backward high -->
+    <path d="M 50 95 Q 75 90 95 65" stroke="#047857" stroke-width="7" stroke-linecap="round"/>
+    <!-- Right Arm holding foot -->
+    <path d="M 48 45 Q 75 35 93 63" stroke="#059669" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <!-- Left Arm extended forward -->
+    <path d="M 48 45 L 10 35" stroke="#059669" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

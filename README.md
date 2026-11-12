@@ -63,3 +63,8 @@ npm run lint
 npm run typecheck
 npm run test
 ```
+
+---
+
+> 📖 **Tài liệu chi tiết:** Để xem hướng dẫn từng bước đầy đủ, danh mục biến môi trường, xử lý lỗi và cấu hình chi tiết, vui lòng xem [Hướng Dẫn Cài Đặt và Chạy Dự Án GymPilot](./docs/HUONG_DAN_CAI_DAT_VA_CHAY_DU_AN.md).
+

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 220" width="350" height="220">
+  <defs>
+    <linearGradient id="sunset" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fdba74"/>
+      <stop offset="60%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#fed7aa" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#fb923c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="350" height="220" fill="url(#sunset)"/>
+  <!-- Sun glow -->
+  <circle cx="175" cy="110" r="85" fill="url(#sun)"/>
+  <!-- Ground -->
+  <rect y="185" width="350" height="35" fill="#431407"/>
+  <!-- Meditating Yoga silhouette (Lotus pose with hands raised) -->
+  <g transform="translate(175, 95)">
+    <!-- Head -->
+    <circle cx="0" cy="20" r="14" fill="#431407"/>
+    <!-- Torso -->
+    <path d="M -12 36 L 12 36 L 16 80 L -16 80 Z" fill="#431407"/>
+    <!-- Folded legs (Lotus) -->
+    <ellipse cx="0" cy="85" rx="42" ry="14" fill="#431407"/>
+    <!-- Raised hands prayer/namaste above head -->
+    <path d="M -12 45 Q -25 25 0 0 Q 25 25 12 45" stroke="#431407" stroke-width="7" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>
