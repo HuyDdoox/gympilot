@@ -33,8 +33,8 @@
 - [x] **T-1.2** Setup backend Express + TS + Prisma + Postgres (Huy - P0)
 - [x] **T-1.3** Setup frontend Vite + React + TS + Tailwind (An - P0)
 - [x] **T-1.4** Thiết kế API contract ban đầu (Cả hai - P0)
-- [ ] **T-1.5** Thiết kế UI system (An - P0)
-- [ ] **T-1.6** Seed dữ liệu demo: 1 gym, 2 staff, 2 trainer, 20 member, 4 plan, 10 class session (Huy - P1)
+- [x] **T-1.5** Thiết kế UI system (An - P0)
+- [x] **T-1.6** Seed dữ liệu demo: 1 gym, 2 staff, 2 trainer, 20 member, 4 plan, 10 class session (Huy - P1)
 
 ---
 
