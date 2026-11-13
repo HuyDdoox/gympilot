@@ -1,2 +1,1 @@
-﻿// plans module placeholder
-export {};
+﻿export * from './plans.routes.js';

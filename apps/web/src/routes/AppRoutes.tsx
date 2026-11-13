@@ -42,6 +42,7 @@ export const AppRoutes: React.FC = () => {
       {/* 1. Public Routes */}
       <Route element={<AppLayout />}>
         <Route path="/" element={<MemberDashboardPage />} />
+        <Route path="/members" element={<MembersPage />} />
       </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />

@@ -45,6 +45,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           to: '/',
           icon: <Compass className="w-4 h-4" />,
         },
+        {
+          title: 'Hội viên (Supabase)',
+          to: '/members',
+          icon: <Users className="w-4 h-4" />,
+        },
       ],
     },
     {

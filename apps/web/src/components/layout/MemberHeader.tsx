@@ -41,6 +41,7 @@ export const MemberHeader: React.FC<MemberHeaderProps> = ({ className }) => {
 
   const navItems = [
     { label: 'Trang chủ', to: '/', icon: <Home className="w-4 h-4" /> },
+    { label: 'Hội viên (Supabase)', to: '/members', icon: <User className="w-4 h-4" /> },
     { label: 'Lịch tập', to: '/member/class-booking', icon: <Calendar className="w-4 h-4" /> },
     { label: 'Đặt lớp', to: '/member/class-booking', icon: <CalendarCheck className="w-4 h-4" /> },
     { label: 'Gói tập', to: '/member/my-membership', icon: <Layers className="w-4 h-4" /> },
