@@ -51,16 +51,28 @@ const safeStorage = {
   },
 };
 
+function notifyAuthChange() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('gympilot_auth_changed'));
+  }
+}
+
 export const authStorage = {
   getToken: (): string | null => safeStorage.getItem(TOKEN_KEY),
-  setToken: (token: string): void => safeStorage.setItem(TOKEN_KEY, token),
+  setToken: (token: string): void => {
+    safeStorage.setItem(TOKEN_KEY, token);
+    notifyAuthChange();
+  },
   clearToken: (): void => {
     safeStorage.removeItem(TOKEN_KEY);
     safeStorage.removeItem(REFRESH_TOKEN_KEY);
     safeStorage.removeItem(USER_KEY);
+    notifyAuthChange();
   },
   getRefreshToken: (): string | null => safeStorage.getItem(REFRESH_TOKEN_KEY),
-  setRefreshToken: (token: string): void => safeStorage.setItem(REFRESH_TOKEN_KEY, token),
+  setRefreshToken: (token: string): void => {
+    safeStorage.setItem(REFRESH_TOKEN_KEY, token);
+  },
 
   getUser: (): UserDto | null => {
     const raw = safeStorage.getItem(USER_KEY);
@@ -73,6 +85,7 @@ export const authStorage = {
   },
   setUser: (user: UserDto): void => {
     safeStorage.setItem(USER_KEY, JSON.stringify(user));
+    notifyAuthChange();
   },
   getUserRole: (): Role | null => {
     const user = authStorage.getUser();

@@ -1,202 +1,210 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Dumbbell, ArrowRight, UserCheck, Shield, AlertCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { ArrowRight, UserCheck, Shield, Mail } from 'lucide-react';
+import { LoginSchema, type Role } from '@gympilot/shared';
 import { authStorage } from '@/lib/auth';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Input } from '@/components/ui';
+import { authService, type LoginInput } from '@/lib/authService';
+import { zodResolver } from '@/lib/zodResolver';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  Button,
+  Input,
+} from '@/components/ui';
+import { AuthLayout, PasswordInput, AuthAlert } from './components';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get target return url if user was redirected from a protected route
+  // URL cần quay lại nếu người dùng bị redirect từ ProtectedRoute
   const fromLocation = (location.state as { from?: { pathname: string } })?.from?.pathname;
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(true);
 
-  const performLogin = (userRole: 'MEMBER' | 'OWNER' | 'STAFF', userData: {
-    id: string;
-    email: string;
-    fullName: string;
-  }) => {
-    // Save token and user details to local storage
-    const token = `gympilot_jwt_${userRole.toLowerCase()}_${Date.now()}`;
-    authStorage.setToken(token);
-    authStorage.setUser({
-      id: userData.id,
-      gymId: 'gym-boutique-01',
-      email: userData.email,
-      fullName: userData.fullName,
-      role: userRole,
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-    // Smart 1-step redirect:
-    // If a redirect URL was saved, send them back there
+  const redirectUserByRole = (userRole: Role) => {
     if (fromLocation && fromLocation !== '/login') {
       navigate(fromLocation, { replace: true });
       return;
     }
 
-    // Otherwise route based on verified role
     if (userRole === 'OWNER') {
       navigate('/owner/dashboard', { replace: true });
     } else if (userRole === 'STAFF') {
       navigate('/staff/today', { replace: true });
     } else {
-      // Default Member route -> Member Homepage
+      // Member về Member Homepage
       navigate('/', { replace: true });
     }
   };
 
-  const handleLoginAsMember = () => {
-    performLogin('MEMBER', {
-      id: 'member-vyan-01',
-      email: 'vyan.mai@gympilot.vn',
-      fullName: 'Mai Thị Vy An',
-    });
-  };
-
-  const handleLoginAsOwner = () => {
-    performLogin('OWNER', {
-      id: 'owner-01',
-      email: 'owner@gympilot.vn',
-      fullName: 'Nguyễn Văn Chủ',
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (!email || !password) {
-      setError('Vui lòng nhập đầy đủ email và mật khẩu');
-      return;
+  const handleFormSubmit = async (data: LoginInput) => {
+    setAuthError(null);
+    try {
+      // Gọi qua Auth Service kết nối Backend API thực tế
+      const result = await authService.login(data);
+      redirectUserByRole(result.user.role);
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Email hoặc mật khẩu không chính xác.');
     }
+  };
 
-    setIsLoading(true);
-
-    // Simulate instant secure auth verification
-    setTimeout(() => {
-      setIsLoading(false);
-      // If email contains "owner" or "admin", log in as OWNER, otherwise as MEMBER
-      if (email.toLowerCase().includes('owner') || email.toLowerCase().includes('admin')) {
-        performLogin('OWNER', {
-          id: 'owner-custom',
-          email,
-          fullName: 'Chủ Phòng Gym',
-        });
-      } else {
-        performLogin('MEMBER', {
-          id: 'member-custom',
-          email,
-          fullName: email.split('@')[0] || 'Hội viên GymPilot',
-        });
-      }
-    }, 400);
+  // 1-Click Fast Login cho kiểm thử môi trường (Demo Roles)
+  const handleQuickDemoLogin = (role: 'MEMBER' | 'OWNER') => {
+    const isOwner = role === 'OWNER';
+    const token = `gympilot_jwt_${role.toLowerCase()}_${Date.now()}`;
+    authStorage.setToken(token);
+    authStorage.setUser({
+      id: isOwner ? 'owner-01' : 'member-vyan-01',
+      gymId: 'gym-boutique-01',
+      email: isOwner ? 'owner@gympilot.vn' : 'vyan.mai@gympilot.vn',
+      fullName: isOwner ? 'Nguyễn Văn Chủ' : 'Mai Thị Vy An',
+      role,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    redirectUserByRole(role);
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 flex items-center justify-center p-4 sm:p-6 font-sans">
-      <div className="max-w-md w-full space-y-6">
-        {/* Brand Logo Header */}
-        <div className="text-center">
-          <Link to="/" className="inline-flex items-center gap-2.5 mb-2 group">
-            <div className="bg-emerald-500 p-2.5 rounded-2xl shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-              <Dumbbell className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-extrabold tracking-tight text-slate-900">
-              Gym<span className="text-emerald-500">Pilot</span>
-            </span>
-          </Link>
-          <p className="text-xs text-slate-500 font-medium">Hệ thống quản lý phòng gym, yoga &amp; pilates</p>
-        </div>
+    <AuthLayout
+      title="Đăng nhập tài khoản"
+      subtitle="Truy cập cổng dịch vụ hội viên và trung tâm điều hành GymPilot"
+      maxWidth="md"
+    >
+      <Card className="bg-white border border-slate-200/80 shadow-lg rounded-2xl overflow-hidden">
+        <CardHeader className="pb-2 pt-6 px-6">
+          <CardTitle className="text-xl font-bold text-slate-900">
+            Chào mừng bạn trở lại
+          </CardTitle>
+          <CardDescription className="text-xs text-slate-500">
+            Nhập email và mật khẩu để tiếp tục vào hệ thống
+          </CardDescription>
+        </CardHeader>
 
-        {/* Login Card */}
-        <Card className="bg-white border-slate-200/80 shadow-lg rounded-2xl p-2">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-bold text-slate-900">Đăng nhập một bước</CardTitle>
-            <CardDescription className="text-xs text-slate-500">
-              Truy cập tài khoản hội viên và hệ thống quản trị
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
+        <CardContent className="space-y-4 px-6 pb-6 pt-2">
+          {/* Thông báo lỗi nếu có */}
+          {authError && <AuthAlert type="error" message={authError} />}
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+          {/* Form đăng nhập */}
+          <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4" noValidate>
+            <div>
               <Input
                 label="Email đăng nhập"
                 type="email"
                 placeholder="vyan.mai@gympilot.vn"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                isRequired
+                leftIcon={<Mail className="w-4 h-4" />}
+                className="bg-white text-slate-900 border-slate-300 focus:bg-white placeholder:text-slate-400"
+                error={errors.email?.message}
+                {...register('email')}
               />
-              <Input
-                label="Mật khẩu"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full justify-center bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 shadow-sm"
-                isLoading={isLoading}
-              >
-                <span>Đăng nhập hệ thống</span>
-                <ArrowRight className="w-4 h-4 ml-1.5" />
-              </Button>
-            </form>
+            </div>
 
-            {/* Quick 1-click test role options */}
-            <div className="pt-4 border-t border-slate-100 space-y-2">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center">
-                Đăng nhập nhanh cho kiểm thử (Demo Roles)
-              </p>
+            <div>
+              <PasswordInput
+                label="Mật khẩu"
+                placeholder="••••••••"
+                isRequired
+                className="bg-white text-slate-900 border-slate-300 focus:bg-white placeholder:text-slate-400"
+                error={errors.password?.message}
+                {...register('password')}
+              />
+            </div>
+
+            {/* Checkbox Ghi nhớ & Quên mật khẩu */}
+            <div className="flex items-center justify-between pt-1 text-xs">
+              <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer"
+                />
+                <span>Ghi nhớ đăng nhập</span>
+              </label>
+
+              <Link
+                to="/forgot-password"
+                className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+              >
+                Quên mật khẩu?
+              </Link>
+            </div>
+
+            {/* Nút Đăng nhập */}
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              isLoading={isSubmitting}
+              className="w-full justify-center bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-2.5 shadow-md shadow-emerald-500/20"
+            >
+              <span>Đăng nhập hệ thống</span>
+              <ArrowRight className="w-4 h-4 ml-1.5" />
+            </Button>
+          </form>
+
+          {/* Link sang Đăng ký */}
+          <div className="text-center pt-2 text-xs text-slate-600">
+            <span>Chưa có tài khoản quản lý phòng gym? </span>
+            <Link
+              to="/register"
+              className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+            >
+              Đăng ký ngay
+            </Link>
+          </div>
+
+          {/* 1-Click Fast Login Demo Roles */}
+          <div className="pt-4 border-t border-slate-100 space-y-2">
+            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center">
+              Đăng nhập nhanh cho kiểm thử (Demo Roles)
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="w-full justify-center bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 font-medium"
-                onClick={handleLoginAsMember}
-                leftIcon={<UserCheck className="w-4 h-4 text-emerald-600" />}
+                className="w-full justify-center bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-semibold py-2"
+                onClick={() => handleQuickDemoLogin('MEMBER')}
+                leftIcon={<UserCheck className="w-3.5 h-3.5 text-emerald-600" />}
               >
-                Vào ngay với vai trò Hội viên (Mai Thị Vy An)
+                Hội viên (Vy An)
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="w-full justify-center text-slate-700 hover:bg-slate-50 border-slate-200 font-medium"
-                onClick={handleLoginAsOwner}
-                leftIcon={<Shield className="w-4 h-4 text-indigo-600" />}
+                className="w-full justify-center text-slate-700 hover:bg-slate-50 border-slate-200 text-xs font-semibold py-2"
+                onClick={() => handleQuickDemoLogin('OWNER')}
+                leftIcon={<Shield className="w-3.5 h-3.5 text-indigo-600" />}
               >
-                Vào với vai trò Chủ phòng (Owner)
+                Chủ phòng (Owner)
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Back to home */}
-        <div className="text-center">
-          <Link to="/" className="text-xs font-medium text-slate-500 hover:text-emerald-600 transition-colors">
-            ← Quay về Trang chủ GymPilot
-          </Link>
-        </div>
-      </div>
-    </div>
+          </div>
+        </CardContent>
+      </Card>
+    </AuthLayout>
   );
 };
 

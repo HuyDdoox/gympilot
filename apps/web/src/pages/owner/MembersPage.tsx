@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Users,
   UserCheck,
@@ -12,6 +13,11 @@ import {
   CheckCircle2,
   AlertCircle,
   Database,
+  Upload,
+  Edit,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { api } from '@/lib/axios';
 import {
@@ -31,6 +37,7 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui';
+import { ImportCsvModal } from './components/ImportCsvModal';
 
 export interface MemberData {
   id: string;
@@ -66,21 +73,34 @@ export interface PlanData {
 }
 
 export const MembersPage: React.FC = () => {
-  // 1. Quản lý State danh sách và API từ Supabase
+  const navigate = useNavigate();
+
+  // 1. Quản lý State danh sách và API từ Supabase / Backend
   const [members, setMembers] = useState<MemberData[]>([]);
   const [plans, setPlans] = useState<PlanData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 2. State tìm kiếm và bộ lọc
+  // 2. State tìm kiếm, bộ lọc và Phân trang (Backend Synced)
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalItems, setTotalItems] = useState<number>(0);
 
-  // 3. State quản lý Modal và Form thêm hội viên mới (Lab 4)
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [formSuccessMessage, setFormSuccessMessage] = useState<string | null>(null);
+  // 3. State Thống kê nhanh tổng quan
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    paused: 0,
+    expired: 0,
+  });
 
+  // 4. State Modal Thêm hội viên mới
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [isSubmittingAdd, setIsSubmittingAdd] = useState<boolean>(false);
+  const [addSuccessMessage, setAddSuccessMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -90,29 +110,77 @@ export const MembersPage: React.FC = () => {
     dateOfBirth: '',
     notes: '',
   });
-
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
-  // 4. Hàm fetch danh sách hội viên từ Backend API (Supabase)
+  // 5. State Modal Chỉnh sửa hội viên
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [editingMember, setEditingMember] = useState<MemberData | null>(null);
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState<boolean>(false);
+  const [editSuccessMessage, setEditSuccessMessage] = useState<string | null>(null);
+  const [editFormErrors, setEditFormErrors] = useState<{ [key: string]: string }>({});
+  const [editFormData, setEditFormData] = useState({
+    fullName: '',
+    phone: '',
+    gender: 'Nam',
+    dateOfBirth: '',
+    status: 'ACTIVE' as 'ACTIVE' | 'PAUSED' | 'EXPIRED' | 'CANCELLED',
+    notes: '',
+  });
+
+  // 6. State Modal Import CSV
+  const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
+
+  // 7. Hàm fetch danh sách hội viên kèm phân trang từ Backend API
   const fetchMembers = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await api.get('/members');
-      if (res.data?.success && res.data?.data?.members) {
-        setMembers(res.data.data.members);
+      const res = await api.get('/members', {
+        params: {
+          page,
+          limit,
+          search: searchTerm.trim() || undefined,
+          status: statusFilter !== 'ALL' ? statusFilter : undefined,
+        },
+      });
+
+      if (res.data?.success && res.data?.data) {
+        const { members: memberList, pagination } = res.data.data;
+        setMembers(memberList || []);
+        if (pagination) {
+          setTotalPages(pagination.totalPages || 1);
+          setTotalItems(pagination.totalItems || memberList.length);
+        }
       } else {
         setMembers([]);
       }
     } catch (err: unknown) {
-      console.error('Lỗi khi tải danh sách hội viên từ Supabase:', err);
-      setError(err instanceof Error ? err.message : 'Không thể kết nối đến máy chủ API Supabase');
+      console.error('Lỗi khi tải danh sách hội viên:', err);
+      setError(err instanceof Error ? err.message : 'Không thể kết nối đến máy chủ API');
     } finally {
       setIsLoading(false);
     }
+  }, [page, limit, searchTerm, statusFilter]);
+
+  // 8. Tải thống kê tổng quan (fetch full count 1 lần)
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await api.get('/members', { params: { limit: 100 } });
+      if (res.data?.success && res.data?.data?.members) {
+        const all: MemberData[] = res.data.data.members;
+        setStats({
+          total: res.data.data.pagination?.totalItems || all.length,
+          active: all.filter((m) => m.status === 'ACTIVE').length,
+          paused: all.filter((m) => m.status === 'PAUSED').length,
+          expired: all.filter((m) => m.status === 'EXPIRED').length,
+        });
+      }
+    } catch {
+      // Bỏ qua lỗi stats phụ
+    }
   }, []);
 
-  // 5. Hàm fetch danh sách gói tập để hiển thị trong Form dropdown
+  // 9. Hàm fetch danh sách gói tập
   const fetchPlans = useCallback(async () => {
     try {
       const res = await api.get('/plans');
@@ -120,16 +188,31 @@ export const MembersPage: React.FC = () => {
         setPlans(res.data.data);
       }
     } catch {
-      // Bỏ qua lỗi plans phụ nếu có
+      // Bỏ qua lỗi plans phụ
     }
   }, []);
 
   useEffect(() => {
     fetchMembers();
-    fetchPlans();
-  }, [fetchMembers, fetchPlans]);
+  }, [fetchMembers]);
 
-  // 6. Xử lý thay đổi dữ liệu trong Form (Controlled Component)
+  useEffect(() => {
+    fetchStats();
+    fetchPlans();
+  }, [fetchStats, fetchPlans]);
+
+  // Reset về page 1 khi filter hoặc search thay đổi
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setPage(1);
+  };
+
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+    setPage(1);
+  };
+
+  // 10. Xử lý Form Thêm hội viên
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
@@ -140,8 +223,7 @@ export const MembersPage: React.FC = () => {
     }
   };
 
-  // 7. Xác thực Form (Form Validation - Lab 4)
-  const validateForm = () => {
+  const validateAddForm = () => {
     const errors: { [key: string]: string } = {};
 
     if (!formData.fullName.trim() || formData.fullName.trim().length < 2) {
@@ -164,13 +246,12 @@ export const MembersPage: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
-  // 8. Submit Form thêm hội viên lên API Node.js -> Lưu vào Supabase
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateAddForm()) return;
 
     try {
-      setIsSubmitting(true);
+      setIsSubmittingAdd(true);
       const res = await api.post('/members', {
         fullName: formData.fullName,
         email: formData.email,
@@ -182,8 +263,7 @@ export const MembersPage: React.FC = () => {
       });
 
       if (res.data?.success) {
-        setFormSuccessMessage(`Đã thêm thành công hội viên "${formData.fullName}" vào Supabase!`);
-        // Reset form
+        setAddSuccessMessage(`Đã thêm thành công hội viên "${formData.fullName}"!`);
         setFormData({
           fullName: '',
           email: '',
@@ -193,12 +273,12 @@ export const MembersPage: React.FC = () => {
           dateOfBirth: '',
           notes: '',
         });
-        // Tải lại danh sách mới nhất từ database
         await fetchMembers();
+        await fetchStats();
         setTimeout(() => {
-          setIsModalOpen(false);
-          setFormSuccessMessage(null);
-        }, 1500);
+          setIsAddModalOpen(false);
+          setAddSuccessMessage(null);
+        }, 1200);
       }
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -207,31 +287,71 @@ export const MembersPage: React.FC = () => {
         general: msg || 'Không thể tạo hội viên mới. Vui lòng kiểm tra lại.',
       }));
     } finally {
-      setIsSubmitting(false);
+      setIsSubmittingAdd(false);
     }
   };
 
-  // 9. Lọc danh sách hội viên theo tìm kiếm và trạng thái
-  const filteredMembers = members.filter((m) => {
-    const matchSearch =
-      m.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      m.phone.includes(searchTerm) ||
-      m.email.toLowerCase().includes(searchTerm.toLowerCase());
+  // 11. Xử lý Chỉnh sửa hội viên
+  const handleOpenEditModal = (m: MemberData) => {
+    setEditingMember(m);
+    setEditFormData({
+      fullName: m.fullName,
+      phone: m.phone,
+      gender: m.gender || 'Nam',
+      dateOfBirth: m.dateOfBirth ? m.dateOfBirth.slice(0, 10) : '',
+      status: m.status,
+      notes: m.notes || '',
+    });
+    setEditFormErrors({});
+    setEditSuccessMessage(null);
+    setIsEditModalOpen(true);
+  };
 
-    const matchStatus = statusFilter === 'ALL' || m.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingMember) return;
 
-  // 10. Tính toán số liệu thống kê nhanh
-  const totalCount = members.length;
-  const activeCount = members.filter((m) => m.status === 'ACTIVE').length;
-  const pausedCount = members.filter((m) => m.status === 'PAUSED').length;
-  const expiredCount = members.filter((m) => m.status === 'EXPIRED').length;
+    if (!editFormData.fullName.trim() || editFormData.fullName.trim().length < 2) {
+      setEditFormErrors({ fullName: 'Họ tên hội viên phải có ít nhất 2 ký tự.' });
+      return;
+    }
+
+    try {
+      setIsSubmittingEdit(true);
+      setEditFormErrors({});
+      const res = await api.put(`/members/${editingMember.id}`, {
+        fullName: editFormData.fullName.trim(),
+        phone: editFormData.phone.trim(),
+        gender: editFormData.gender,
+        dateOfBirth: editFormData.dateOfBirth || undefined,
+        status: editFormData.status,
+        notes: editFormData.notes.trim() || undefined,
+      });
+
+      if (res.data?.success) {
+        setEditSuccessMessage('Cập nhật thông tin hội viên thành công!');
+        await fetchMembers();
+        await fetchStats();
+        setTimeout(() => {
+          setIsEditModalOpen(false);
+          setEditSuccessMessage(null);
+          setEditingMember(null);
+        }, 1200);
+      }
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setEditFormErrors({
+        general: msg || 'Không thể cập nhật hội viên.',
+      });
+    } finally {
+      setIsSubmittingEdit(false);
+    }
+  };
 
   return (
     <div className="w-full bg-[#f8fafc] text-slate-800 pb-16 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
-        {/* Banner nguồn dữ liệu Supabase */}
+        {/* Banner nguồn dữ liệu và thao tác đầu trang */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-indigo-500/10 border border-emerald-200/80 shadow-xs">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-emerald-500 text-white shadow-xs">
@@ -240,7 +360,7 @@ export const MembersPage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-slate-900">
-                  Cơ sở dữ liệu Supabase PostgreSQL 17 (Live API)
+                  Cơ sở dữ liệu GymPilot (Live API Backend)
                 </span>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -248,11 +368,11 @@ export const MembersPage: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Minh họa Lab 4 (State + Form Validation) &amp; ASM 1 (Kết nối API Node.js Express với Database)
+                Quản lý hồ sơ hội viên, tìm kiếm, phân trang và import hàng loạt bằng tệp CSV.
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               variant="outline"
               size="sm"
@@ -260,12 +380,20 @@ export const MembersPage: React.FC = () => {
               disabled={isLoading}
               leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />}
             >
-              Làm mới dữ liệu
+              Làm mới
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsImportModalOpen(true)}
+              leftIcon={<Upload className="w-3.5 h-3.5 text-emerald-600" />}
+            >
+              Import CSV
             </Button>
             <Button
               variant="primary"
               size="sm"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsAddModalOpen(true)}
               leftIcon={<Plus className="w-4 h-4" />}
             >
               Thêm hội viên
@@ -279,7 +407,7 @@ export const MembersPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tổng hội viên</p>
-                <h3 className="text-2xl font-extrabold text-slate-900 mt-1">{totalCount}</h3>
+                <h3 className="text-2xl font-extrabold text-slate-900 mt-1">{stats.total || totalItems}</h3>
               </div>
               <div className="p-3 rounded-xl bg-slate-100 text-slate-600">
                 <Users className="w-5 h-5" />
@@ -291,7 +419,7 @@ export const MembersPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Đang hoạt động</p>
-                <h3 className="text-2xl font-extrabold text-emerald-600 mt-1">{activeCount}</h3>
+                <h3 className="text-2xl font-extrabold text-emerald-600 mt-1">{stats.active}</h3>
               </div>
               <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600">
                 <UserCheck className="w-5 h-5" />
@@ -303,7 +431,7 @@ export const MembersPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tạm dừng (Paused)</p>
-                <h3 className="text-2xl font-extrabold text-amber-600 mt-1">{pausedCount}</h3>
+                <h3 className="text-2xl font-extrabold text-amber-600 mt-1">{stats.paused}</h3>
               </div>
               <div className="p-3 rounded-xl bg-amber-50 text-amber-600">
                 <Clock className="w-5 h-5" />
@@ -315,7 +443,7 @@ export const MembersPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Hết hạn (Expired)</p>
-                <h3 className="text-2xl font-extrabold text-red-600 mt-1">{expiredCount}</h3>
+                <h3 className="text-2xl font-extrabold text-red-600 mt-1">{stats.expired}</h3>
               </div>
               <div className="p-3 rounded-xl bg-red-50 text-red-600">
                 <UserX className="w-5 h-5" />
@@ -333,7 +461,7 @@ export const MembersPage: React.FC = () => {
                 type="text"
                 placeholder="Tìm theo họ tên, SĐT, email..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50"
               />
             </div>
@@ -349,7 +477,7 @@ export const MembersPage: React.FC = () => {
                 ].map((tab) => (
                   <button
                     key={tab.key}
-                    onClick={() => setStatusFilter(tab.key)}
+                    onClick={() => handleStatusFilterChange(tab.key)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                       statusFilter === tab.key
                         ? 'bg-emerald-600 text-white shadow-xs'
@@ -364,133 +492,196 @@ export const MembersPage: React.FC = () => {
           </div>
         </Card>
 
-        {/* Bảng Danh Sách Hội Viên (Lab 3: Component + Props + List Rendering) */}
+        {/* Bảng Danh Sách Hội Viên */}
         <Card className="bg-white border-slate-200/80 rounded-2xl overflow-hidden shadow-xs">
           {isLoading ? (
             <div className="p-12 text-center space-y-3">
               <LoadingSpinner size="lg" className="mx-auto" />
-              <p className="text-sm text-slate-500">Đang tải danh sách 20 hội viên từ Supabase...</p>
+              <p className="text-sm text-slate-500">Đang tải danh sách hội viên...</p>
             </div>
           ) : error ? (
             <div className="p-8">
               <ErrorState title="Lỗi kết nối API" message={error} onRetry={fetchMembers} />
             </div>
-          ) : filteredMembers.length === 0 ? (
+          ) : members.length === 0 ? (
             <div className="p-8">
               <EmptyState
                 title="Không tìm thấy hội viên nào"
                 description="Hãy thử đổi từ khóa tìm kiếm hoặc bấm thêm hội viên mới."
                 actionLabel="Thêm hội viên"
-                onAction={() => setIsModalOpen(true)}
+                onAction={() => setIsAddModalOpen(true)}
               />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Hội viên</TableHead>
-                  <TableHead>Liên hệ</TableHead>
-                  <TableHead>Gói tập đang dùng</TableHead>
-                  <TableHead>Trạng thái</TableHead>
-                  <TableHead>Mã QR</TableHead>
-                  <TableHead>Ngày tham gia</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredMembers.map((m) => (
-                  <TableRow key={m.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0 border border-emerald-200">
-                          {m.fullName.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-900 text-sm">{m.fullName}</p>
-                          <p className="text-[11px] text-slate-500">
-                            {m.gender} • {m.dateOfBirth ? m.dateOfBirth : 'N/A'}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <p className="text-sm font-medium text-slate-800">{m.phone}</p>
-                      <p className="text-xs text-slate-500">{m.email}</p>
-                    </TableCell>
-
-                    <TableCell>
-                      {m.activeMembership ? (
-                        <div>
-                          <p className="font-semibold text-xs text-slate-900">
-                            {m.activeMembership.planName}
-                          </p>
-                          <p className="text-[11px] text-slate-500">
-                            {m.activeMembership.sessionsLeft !== null
-                              ? `Còn ${m.activeMembership.sessionsLeft} buổi`
-                              : m.activeMembership.endDate
-                              ? `Hạn đến ${m.activeMembership.endDate}`
-                              : 'Vô thời hạn'}
-                          </p>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-slate-400 italic">Chưa đăng ký gói</span>
-                      )}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge
-                        variant={
-                          m.status === 'ACTIVE'
-                            ? 'success'
-                            : m.status === 'PAUSED'
-                            ? 'warning'
-                            : 'error'
-                        }
-                      >
-                        {m.status === 'ACTIVE'
-                          ? 'Hoạt động'
-                          : m.status === 'PAUSED'
-                          ? 'Tạm dừng'
-                          : 'Hết hạn'}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200">
-                        <QrCode className="w-3 h-3 text-emerald-600" />
-                        {m.qrToken.slice(0, 16)}...
-                      </span>
-                    </TableCell>
-
-                    <TableCell>
-                      <span className="text-xs text-slate-600">
-                        {new Date(m.joinedAt).toLocaleDateString('vi-VN')}
-                      </span>
-                    </TableCell>
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Hội viên</TableHead>
+                    <TableHead>Liên hệ</TableHead>
+                    <TableHead>Gói tập đang dùng</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+                    <TableHead>Mã QR</TableHead>
+                    <TableHead>Ngày tham gia</TableHead>
+                    <TableHead className="text-right">Thao tác</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {members.map((m) => (
+                    <TableRow key={m.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center shrink-0 border border-emerald-200">
+                            {m.fullName.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-900 text-sm">{m.fullName}</p>
+                            <p className="text-[11px] text-slate-500">
+                              {m.gender} • {m.dateOfBirth ? m.dateOfBirth : 'N/A'}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <p className="text-sm font-medium text-slate-800">{m.phone}</p>
+                        <p className="text-xs text-slate-500">{m.email}</p>
+                      </TableCell>
+
+                      <TableCell>
+                        {m.activeMembership ? (
+                          <div>
+                            <p className="font-semibold text-xs text-slate-900">
+                              {m.activeMembership.planName}
+                            </p>
+                            <p className="text-[11px] text-slate-500">
+                              {m.activeMembership.sessionsLeft !== null
+                                ? `Còn ${m.activeMembership.sessionsLeft} buổi`
+                                : m.activeMembership.endDate
+                                ? `Hạn đến ${m.activeMembership.endDate}`
+                                : 'Vô thời hạn'}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-400 italic">Chưa đăng ký gói</span>
+                        )}
+                      </TableCell>
+
+                      <TableCell>
+                        <Badge
+                          variant={
+                            m.status === 'ACTIVE'
+                              ? 'success'
+                              : m.status === 'PAUSED'
+                              ? 'warning'
+                              : 'error'
+                          }
+                        >
+                          {m.status === 'ACTIVE'
+                            ? 'Hoạt động'
+                            : m.status === 'PAUSED'
+                            ? 'Tạm dừng'
+                            : 'Hết hạn'}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell>
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200">
+                          <QrCode className="w-3 h-3 text-emerald-600" />
+                          {m.qrToken ? m.qrToken.slice(0, 14) + '...' : '---'}
+                        </span>
+                      </TableCell>
+
+                      <TableCell>
+                        <span className="text-xs text-slate-600">
+                          {new Date(m.joinedAt).toLocaleDateString('vi-VN')}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="text-right">
+                        <div className="inline-flex items-center gap-1.5 justify-end">
+                          <button
+                            onClick={() => navigate(`/owner/members/${m.id}`)}
+                            title="Xem chi tiết hồ sơ"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleOpenEditModal(m)}
+                            title="Chỉnh sửa hội viên"
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {/* Phân Trang Backend Synced */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-slate-100 text-xs text-slate-500">
+                <div>
+                  Hiển thị{' '}
+                  <strong className="text-slate-700">
+                    {totalItems === 0 ? 0 : (page - 1) * limit + 1}
+                  </strong>{' '}
+                  -{' '}
+                  <strong className="text-slate-700">
+                    {Math.min(page * limit, totalItems)}
+                  </strong>{' '}
+                  trong tổng số <strong className="text-slate-700">{totalItems}</strong> hội viên
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page <= 1 || isLoading}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    leftIcon={<ChevronLeft className="w-3.5 h-3.5" />}
+                  >
+                    Trước
+                  </Button>
+
+                  <span className="px-3 py-1 text-xs font-semibold text-slate-700 bg-slate-100 rounded-lg">
+                    {page} / {totalPages || 1}
+                  </span>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page >= totalPages || isLoading}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    rightIcon={<ChevronRight className="w-3.5 h-3.5" />}
+                  >
+                    Sau
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
         </Card>
       </div>
 
-      {/* Modal Form Thêm Hội Viên (Lab 4: State + Controlled Form + Validation) */}
+      {/* Modal Form Thêm Hội Viên Mới */}
       <Modal
-        isOpen={isModalOpen}
+        isOpen={isAddModalOpen}
         onClose={() => {
-          setIsModalOpen(false);
+          setIsAddModalOpen(false);
           setFormErrors({});
-          setFormSuccessMessage(null);
+          setAddSuccessMessage(null);
         }}
-        title="Thêm Hội Viên Mới (Lưu Vào Supabase)"
+        title="Thêm Hội Viên Mới"
         description="Nhập thông tin cá nhân và gói tập để tạo tài khoản hội viên mới vào database."
         maxWidth="lg"
       >
-        {formSuccessMessage && (
+        {addSuccessMessage && (
           <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{formSuccessMessage}</span>
+            <span>{addSuccessMessage}</span>
           </div>
         )}
 
@@ -501,7 +692,7 @@ export const MembersPage: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleFormSubmit} className="space-y-4">
+        <form onSubmit={handleAddSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
               <Input
@@ -601,8 +792,8 @@ export const MembersPage: React.FC = () => {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setIsModalOpen(false)}
-              disabled={isSubmitting}
+              onClick={() => setIsAddModalOpen(false)}
+              disabled={isSubmittingAdd}
             >
               Hủy
             </Button>
@@ -610,15 +801,157 @@ export const MembersPage: React.FC = () => {
               type="submit"
               variant="primary"
               size="sm"
-              disabled={isSubmitting}
-              isLoading={isSubmitting}
+              disabled={isSubmittingAdd}
+              isLoading={isSubmittingAdd}
               leftIcon={<ShieldCheck className="w-4 h-4" />}
             >
-              Lưu vào Supabase
+              Lưu hội viên
             </Button>
           </div>
         </form>
       </Modal>
+
+      {/* Modal Form Chỉnh Sửa Hội Viên */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditFormErrors({});
+          setEditSuccessMessage(null);
+          setEditingMember(null);
+        }}
+        title="Chỉnh Sửa Thông Tin Hội Viên"
+        description="Cập nhật thông tin cá nhân và trạng thái hoạt động của hội viên."
+        maxWidth="lg"
+      >
+        {editSuccessMessage && (
+          <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{editSuccessMessage}</span>
+          </div>
+        )}
+
+        {editFormErrors.general && (
+          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{editFormErrors.general}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleEditSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <Input
+                label="Họ và tên"
+                name="fullName"
+                value={editFormData.fullName}
+                onChange={(e) => setEditFormData((p) => ({ ...p, fullName: e.target.value }))}
+                error={editFormErrors.fullName}
+                isRequired
+              />
+            </div>
+            <div>
+              <Input
+                label="Số điện thoại"
+                name="phone"
+                value={editFormData.phone}
+                onChange={(e) => setEditFormData((p) => ({ ...p, phone: e.target.value }))}
+                isRequired
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div>
+              <Select
+                label="Giới tính"
+                name="gender"
+                value={editFormData.gender}
+                onChange={(e) => setEditFormData((p) => ({ ...p, gender: e.target.value }))}
+                options={[
+                  { value: 'Nam', label: 'Nam' },
+                  { value: 'Nữ', label: 'Nữ' },
+                  { value: 'Khác', label: 'Khác' },
+                ]}
+              />
+            </div>
+            <div>
+              <Input
+                label="Ngày sinh"
+                type="date"
+                name="dateOfBirth"
+                value={editFormData.dateOfBirth}
+                onChange={(e) => setEditFormData((p) => ({ ...p, dateOfBirth: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Select
+                label="Trạng thái"
+                name="status"
+                value={editFormData.status}
+                onChange={(e) =>
+                  setEditFormData((p) => ({
+                    ...p,
+                    status: e.target.value as 'ACTIVE' | 'PAUSED' | 'EXPIRED' | 'CANCELLED',
+                  }))
+                }
+                options={[
+                  { value: 'ACTIVE', label: 'Hoạt động' },
+                  { value: 'PAUSED', label: 'Tạm dừng' },
+                  { value: 'EXPIRED', label: 'Hết hạn' },
+                  { value: 'CANCELLED', label: 'Đã hủy' },
+                ]}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Ghi chú thể trạng
+            </label>
+            <textarea
+              name="notes"
+              rows={3}
+              value={editFormData.notes}
+              onChange={(e) => setEditFormData((p) => ({ ...p, notes: e.target.value }))}
+              placeholder="Ghi chú về thể trạng..."
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+            />
+          </div>
+
+          <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditModalOpen(false)}
+              disabled={isSubmittingEdit}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              disabled={isSubmittingEdit}
+              isLoading={isSubmittingEdit}
+              leftIcon={<ShieldCheck className="w-4 h-4" />}
+            >
+              Cập nhật
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Modal Import CSV Hội Viên (T-2.6) */}
+      <ImportCsvModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={() => {
+          fetchMembers();
+          fetchStats();
+        }}
+      />
     </div>
   );
 };

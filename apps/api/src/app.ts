@@ -5,6 +5,7 @@ import { API_PREFIX } from './config/constants.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
 import { memberRoutes } from './modules/members/index.js';
 import { planRoutes } from './modules/plans/index.js';
+import { authRoutes } from './modules/auth/auth.routes.js';
 
 export const app: Express = express();
 
@@ -28,6 +29,7 @@ app.get(`${API_PREFIX}/health`, (_req: Request, res: Response) => {
 });
 
 // Business module endpoints
+app.use(`${API_PREFIX}/auth`, authRoutes);
 app.use(`${API_PREFIX}/members`, memberRoutes);
 app.use(`${API_PREFIX}/plans`, planRoutes);
 

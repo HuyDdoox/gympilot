@@ -25,19 +25,104 @@ api.interceptors.request.use(
   }
 );
 
-// Response Interceptor: Xử lý tập trung response và bắt lỗi 401 an toàn
+// Queue quản lý các request đồng thời khi token đang được làm mới (Auto Refresh Token)
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: unknown) => void;
+  reject: (reason?: unknown) => void;
+}> = [];
+
+const processQueue = (error: Error | null, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Response Interceptor: Xử lý tập trung response và tự động Refresh Token khi gặp lỗi 401
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      // Khi token hết hạn hoặc không hợp lệ:
-      // Lưu ý: Hiện tại Backend (Huy) chưa hoàn thiện contract cho endpoint refresh token (/api/auth/refresh).
-      // Để tránh vòng lặp request vô hạn, ta xóa token và điều hướng về trang đăng nhập nếu chưa ở trang login.
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    // Bỏ qua nếu lỗi không phải 401 hoặc request là các endpoint auth cơ bản (tránh vòng lặp vô hạn)
+    if (
+      !error.response ||
+      error.response.status !== 401 ||
+      originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/auth/refresh-token')
+    ) {
+      return Promise.reject(error);
+    }
+
+    // Đã thử refresh nhưng vẫn 401 -> Đăng xuất
+    if (originalRequest._retry) {
       authStorage.clearToken();
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
         window.location.href = '/login';
       }
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    const refreshToken = authStorage.getRefreshToken();
+    if (!refreshToken) {
+      authStorage.clearToken();
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+      return Promise.reject(error);
+    }
+
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      })
+        .then((newToken) => {
+          if (originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          }
+          return api(originalRequest);
+        })
+        .catch((err) => Promise.reject(err));
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      const response = await axios.post(`${baseURL}/auth/refresh-token`, {
+        refreshToken,
+      });
+
+      if (response.data?.success && response.data?.data?.tokens) {
+        const { accessToken, refreshToken: newRefreshToken } = response.data.data.tokens;
+        authStorage.setToken(accessToken);
+        if (newRefreshToken) {
+          authStorage.setRefreshToken(newRefreshToken);
+        }
+
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        }
+
+        processQueue(null, accessToken);
+        return api(originalRequest);
+      } else {
+        throw new Error('Refresh token không thành công');
+      }
+    } catch (refreshErr) {
+      processQueue(refreshErr instanceof Error ? refreshErr : new Error('Refresh failed'), null);
+      authStorage.clearToken();
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+      return Promise.reject(refreshErr);
+    } finally {
+      isRefreshing = false;
+    }
   }
 );

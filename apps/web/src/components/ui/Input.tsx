@@ -27,7 +27,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const inputId = id || (label ? `input-${label.toLowerCase().replace(/\s+/g, '-')}` : undefined);
+    const inputId = id || (label ? `input-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}` : undefined);
     const hasError = Boolean(error);
 
     return (
@@ -50,14 +50,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={hasError}
             aria-describedby={hasError && inputId ? `${inputId}-error` : undefined}
             className={cn(
-              'w-full bg-slate-900 border text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm transition-all duration-150',
-              'focus:outline-none focus:ring-2 focus:border-transparent',
+              'w-full bg-white border text-slate-900 placeholder:text-slate-400 rounded-xl px-4 py-2.5 text-xs sm:text-sm transition-all duration-150',
+              'focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               hasError
-                ? 'border-red-500/80 focus:ring-red-500/50 bg-red-950/10'
-                : 'border-slate-700/80 hover:border-slate-600 focus:ring-emerald-500/50 focus:border-emerald-500',
-              disabled && 'opacity-60 cursor-not-allowed bg-slate-950/60',
+                ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500 bg-red-50/20'
+                : 'border-slate-300 hover:border-slate-400',
+              disabled && 'opacity-60 cursor-not-allowed bg-slate-50',
               className
             )}
             {...props}
@@ -69,12 +69,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {hasError && (
-          <p id={inputId ? `${inputId}-error` : undefined} className="mt-1.5 text-xs text-red-400 font-medium">
+          <p id={inputId ? `${inputId}-error` : undefined} className="mt-1.5 text-xs text-red-600 font-medium leading-tight">
             {error}
           </p>
         )}
         {!hasError && helperText && (
-          <p className="mt-1.5 text-xs text-slate-400">{helperText}</p>
+          <p className="mt-1.5 text-xs text-slate-500 leading-tight">{helperText}</p>
         )}
       </div>
     );

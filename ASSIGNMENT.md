@@ -38,26 +38,22 @@
 
 ---
 
-### Sprint 2 — Ngày 8–14: Auth và Hội viên (TIẾP THEO)
-- [ ] **T-2.1 Auth API** (Huy - P0): Register owner, login, refresh, logout, GET `/api/me`, bcrypt, JWT, role middleware.
-- [ ] **T-2.2 Auth UI** (An - P0): Login, Register, Forgot Password, ProtectedRoute, RoleGuard, auto refresh token, logout.
-- [ ] **T-2.3 Member API** (Huy - P0): CRUD member, search/filter/pagination, tạo user role MEMBER, gửi email kích hoạt.
-- [ ] **T-2.4 Member UI** (An - P0): Bảng member, search, filter, pagination, form thêm/sửa, trang chi tiết member.
-- [ ] **T-2.5 Import CSV** (Huy - P1): API import, validate từng dòng, trả kết quả thành công/lỗi.
-- [ ] **T-2.6 Import UI** (An - P1): Upload CSV, preview, progress, danh sách lỗi theo dòng, tải template.
-
-> **Dependencies:**
-> - An cần Huy cung cấp response shape của `POST /api/auth/login` trước ngày 8.
-> - Huy cần An xác nhận trường hiển thị trên bảng member trước ngày 8: tên, SĐT, email, gói hiện tại, trạng thái, ngày hết hạn.
+### Sprint 2 — Ngày 8–14: Auth và Hội viên (DONE ✅)
+- [x] **T-2.1 Auth API** (Huy - P0): Register owner, login, refresh, logout, GET `/api/me`, bcrypt, JWT, role middleware.
+- [x] **T-2.2 Auth UI** (An - P0): Login, Register, Forgot Password, ProtectedRoute, RoleGuard, auto refresh token, logout.
+- [x] **T-2.3 Member API** (Huy - P0): CRUD member, search/filter/pagination, tạo user role MEMBER, gửi email kích hoạt.
+- [x] **T-2.4 Member UI** (An - P0): Bảng member, search, filter, pagination, form thêm/sửa, trang chi tiết member.
+- [x] **T-2.5 Import CSV** (Huy - P1): API import, validate từng dòng, trả kết quả thành công/lỗi.
+- [x] **T-2.6 Import UI** (An - P1): Upload CSV, preview, progress, danh sách lỗi theo dòng, tải template.
 
 ---
 
-### Sprint 3 — Ngày 15–21: Gói tập và Membership
-- [ ] **T-3.1 Plan API** (Huy - P0): CRUD plan, validate giá, duration, totalSessions.
+### Sprint 3 — Ngày 15–21: Gói tập và Membership (ĐANG TRIỂN KHAI 🚀)
+- [x] **T-3.1 Plan API** (Huy - P0): CRUD plan, validate giá, duration, totalSessions, unit tests.
 - [ ] **T-3.2 Membership API** (Huy - P0): Mua gói, gia hạn, tính endDate, sessionsLeft, trạng thái hết hạn.
-- [ ] **T-3.3 Plan UI** (An - P0): Trang danh sách gói, form tạo/sửa gói, card gói.
+- [x] **T-3.3 Plan UI** (An - P0): Trang danh sách gói, form tạo/sửa gói, toggle active, thống kê biểu phí.
 - [ ] **T-3.4 Membership UI** (An - P0): Mua gói, gia hạn, lịch sử gói, trạng thái gói, số buổi còn lại.
-- [ ] **T-3.5 Member portal** (An - P1): Dashboard hội viên: gói hiện tại, số buổi, lịch lớp, QR.
+- [x] **T-3.5 Member portal** (An - P1): Dashboard hội viên: gói hiện tại, số buổi, lịch lớp, QR, Profile Sidebar.
 - [ ] **T-3.6 Cron hết hạn** (Huy - P1): Job đánh dấu membership EXPIRED, tạo notification.
 
 ---

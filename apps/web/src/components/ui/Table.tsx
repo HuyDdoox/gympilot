@@ -12,8 +12,8 @@ export const Table: React.FC<TableProps> = ({
   ...props
 }) => {
   return (
-    <div className={cn('w-full overflow-x-auto rounded-xl border border-slate-700/60 bg-slate-800/40', containerClassName)}>
-      <table className={cn('w-full text-left text-sm text-slate-200 border-collapse', className)} {...props}>
+    <div className={cn('w-full overflow-x-auto rounded-2xl border border-slate-200/90 bg-white shadow-xs', containerClassName)}>
+      <table className={cn('w-full text-left text-xs sm:text-sm text-slate-700 border-collapse', className)} {...props}>
         {children}
       </table>
     </div>
@@ -26,7 +26,7 @@ export const TableHeader: React.FC<React.HTMLAttributes<HTMLTableSectionElement>
   ...props
 }) => {
   return (
-    <thead className={cn('bg-slate-800/80 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700/60', className)} {...props}>
+    <thead className={cn('bg-slate-50 text-[11px] font-semibold text-slate-600 uppercase tracking-wider border-b border-slate-200/80', className)} {...props}>
       {children}
     </thead>
   );
@@ -38,7 +38,7 @@ export const TableBody: React.FC<React.HTMLAttributes<HTMLTableSectionElement>> 
   ...props
 }) => {
   return (
-    <tbody className={cn('divide-y divide-slate-700/40', className)} {...props}>
+    <tbody className={cn('divide-y divide-slate-100', className)} {...props}>
       {children}
     </tbody>
   );
@@ -52,7 +52,7 @@ export const TableRow: React.FC<React.HTMLAttributes<HTMLTableRowElement>> = ({
   return (
     <tr
       className={cn(
-        'hover:bg-slate-700/30 transition-colors duration-150',
+        'hover:bg-slate-50/80 transition-colors duration-150',
         className
       )}
       {...props}
@@ -68,7 +68,7 @@ export const TableHead: React.FC<React.ThHTMLAttributes<HTMLTableCellElement>> =
   ...props
 }) => {
   return (
-    <th className={cn('px-4 py-3 font-semibold text-slate-300', className)} {...props}>
+    <th className={cn('px-4 sm:px-6 py-3 font-semibold text-slate-700 select-none', className)} {...props}>
       {children}
     </th>
   );
@@ -80,7 +80,7 @@ export const TableCell: React.FC<React.TdHTMLAttributes<HTMLTableCellElement>> =
   ...props
 }) => {
   return (
-    <td className={cn('px-4 py-3 text-slate-300 align-middle', className)} {...props}>
+    <td className={cn('px-4 sm:px-6 py-3.5 text-slate-700 align-middle', className)} {...props}>
       {children}
     </td>
   );

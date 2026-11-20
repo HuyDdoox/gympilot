@@ -62,7 +62,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -70,7 +70,7 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal Dialog Content */}
       <div
         className={cn(
-          'relative w-full rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-200',
+          'relative w-full rounded-2xl bg-white border border-slate-200/90 shadow-2xl z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-slate-800',
           maxWidthStyles[maxWidth],
           className
         )}
@@ -78,30 +78,30 @@ export const Modal: React.FC<ModalProps> = ({
       >
         {/* Header */}
         {(title || description) && (
-          <div className="flex items-start justify-between p-6 pb-4 border-b border-slate-700/60">
+          <div className="flex items-start justify-between p-5 sm:p-6 pb-3 sm:pb-4 border-b border-slate-100">
             <div>
               {title && (
-                <h3 id="modal-title" className="text-lg font-semibold text-white">
+                <h3 id="modal-title" className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
                   {title}
                 </h3>
               )}
               {description && (
-                <p className="mt-1 text-sm text-slate-400">{description}</p>
+                <p className="mt-1 text-xs text-slate-500 leading-relaxed">{description}</p>
               )}
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/60 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
               aria-label="Đóng hộp thoại"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         )}
 
         {/* Body */}
-        <div className="p-6">{children}</div>
+        <div className="p-5 sm:p-6">{children}</div>
       </div>
     </div>
   );

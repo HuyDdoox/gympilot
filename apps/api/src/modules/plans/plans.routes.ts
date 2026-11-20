@@ -1,22 +1,33 @@
-import { Router, type Request, type Response } from 'express';
-import { prisma } from '../../prisma/client.js';
+import { Router } from 'express';
+import { plansController } from './plans.controller.js';
+import { authMiddleware } from '../../middlewares/auth.middleware.js';
+import { roleMiddleware } from '../../middlewares/role.middleware.js';
+import { Role } from '@gympilot/shared';
 
 export const planRoutes: Router = Router();
 
-planRoutes.get('/', async (_req: Request, res: Response) => {
-  try {
-    const plans = await prisma.plan.findMany({
-      where: { isActive: true },
-      orderBy: { price: 'asc' },
-    });
-    res.status(200).json({
-      success: true,
-      data: plans,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error instanceof Error ? error.message : 'Lỗi khi lấy danh sách gói tập',
-    });
-  }
-});
+// Public / Member read endpoints
+planRoutes.get('/', (req, res, next) => plansController.getPlans(req, res, next));
+planRoutes.get('/:id', (req, res, next) => plansController.getPlanById(req, res, next));
+
+// Owner management endpoints
+planRoutes.post(
+  '/',
+  authMiddleware,
+  roleMiddleware(Role.OWNER),
+  (req, res, next) => plansController.createPlan(req, res, next)
+);
+
+planRoutes.put(
+  '/:id',
+  authMiddleware,
+  roleMiddleware(Role.OWNER),
+  (req, res, next) => plansController.updatePlan(req, res, next)
+);
+
+planRoutes.delete(
+  '/:id',
+  authMiddleware,
+  roleMiddleware(Role.OWNER),
+  (req, res, next) => plansController.deletePlan(req, res, next)
+);

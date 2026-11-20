@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layout & Guards
 import { AppLayout } from '@/components/layout';
@@ -30,8 +30,10 @@ import MyClassesPage from '@/pages/trainer/MyClassesPage';
 // Member Pages
 import MemberDashboardPage from '@/pages/member/MemberDashboardPage';
 import ClassBookingPage from '@/pages/member/ClassBookingPage';
+import SchedulePage from '@/pages/member/SchedulePage';
 import MyMembershipPage from '@/pages/member/MyMembershipPage';
 import MyQrPage from '@/pages/member/MyQrPage';
+import MemberProfilePage from '@/pages/member/MemberProfilePage';
 
 // 404 Page
 import NotFoundPage from '@/pages/NotFoundPage';
@@ -39,11 +41,19 @@ import NotFoundPage from '@/pages/NotFoundPage';
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* 1. Public Routes */}
+      {/* 1. Public Routes: Consumer Homepage, Class Booking & Schedule Browser */}
       <Route element={<AppLayout />}>
         <Route path="/" element={<MemberDashboardPage />} />
+        <Route path="/member" element={<MemberDashboardPage />} />
+        <Route path="/member/dashboard" element={<MemberDashboardPage />} />
+        <Route path="/member/class-booking" element={<ClassBookingPage />} />
+        <Route path="/member/booking" element={<ClassBookingPage />} />
+        <Route path="/booking" element={<ClassBookingPage />} />
+        <Route path="/member/schedule" element={<SchedulePage />} />
         <Route path="/members" element={<MembersPage />} />
       </Route>
+
+      {/* Auth Public Pages */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -73,13 +83,13 @@ export const AppRoutes: React.FC = () => {
             <Route path="/trainer/my-classes" element={<MyClassesPage />} />
           </Route>
 
-          {/* Member & Owner Routes */}
+          {/* Member & Owner Personal Protected Routes */}
           <Route element={<RoleGuard allowedRoles={['OWNER', 'MEMBER']} />}>
-            <Route path="/member" element={<MemberDashboardPage />} />
-            <Route path="/member/dashboard" element={<MemberDashboardPage />} />
-            <Route path="/member/class-booking" element={<ClassBookingPage />} />
-            <Route path="/member/my-membership" element={<MyMembershipPage />} />
+            <Route path="/member/my-membership" element={<MyMembershipPage defaultTab="plans" />} />
+            {/* Redirect /member/payments directly to Member Profile payments tab */}
+            <Route path="/member/payments" element={<Navigate to="/member/profile?tab=payments" replace />} />
             <Route path="/member/my-qr" element={<MyQrPage />} />
+            <Route path="/member/profile" element={<MemberProfilePage />} />
           </Route>
         </Route>
       </Route>

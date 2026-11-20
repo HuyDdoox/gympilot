@@ -16,37 +16,37 @@ export const Badge: React.FC<BadgeProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    success: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-    warning: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-    error: 'bg-red-500/15 text-red-400 border-red-500/30',
-    info: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-    neutral: 'bg-slate-700/40 text-slate-300 border-slate-600/40',
+    success: 'bg-emerald-50 text-emerald-800 border-emerald-200/90 font-semibold',
+    warning: 'bg-amber-50 text-amber-800 border-amber-200/90 font-semibold',
+    error: 'bg-red-50 text-red-800 border-red-200/90 font-semibold',
+    info: 'bg-blue-50 text-blue-800 border-blue-200/90 font-semibold',
+    neutral: 'bg-slate-100 text-slate-700 border-slate-200 font-semibold',
   };
 
   const dotColors = {
-    success: 'bg-emerald-400',
-    warning: 'bg-amber-400',
-    error: 'bg-red-400',
-    info: 'bg-blue-400',
-    neutral: 'bg-slate-400',
+    success: 'bg-emerald-600',
+    warning: 'bg-amber-600',
+    error: 'bg-red-600',
+    info: 'bg-blue-600',
+    neutral: 'bg-slate-500',
   };
 
   const sizeStyles = {
-    sm: 'text-[11px] px-2 py-0.5 rounded-full',
-    md: 'text-xs px-2.5 py-1 rounded-full',
+    sm: 'text-[10px] px-2 py-0.5 rounded-md gap-1',
+    md: 'text-xs px-2.5 py-1 rounded-full gap-1.5',
   };
 
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 font-medium border select-none',
+        'inline-flex items-center border select-none whitespace-nowrap',
         variantStyles[variant],
         sizeStyles[size],
         className
       )}
       {...props}
     >
-      {hasDot && <span className={cn('w-1.5 h-1.5 rounded-full', dotColors[variant])} />}
+      {hasDot && <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', dotColors[variant])} />}
       <span>{children}</span>
     </span>
   );

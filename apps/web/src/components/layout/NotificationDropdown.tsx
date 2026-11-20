@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Dumbbell, Calendar, Gift, Bell, ArrowRight } from 'lucide-react';
-import { type MemberNotification } from '@/pages/member/mockData';
+import { type MemberNotification } from '@/features/member/data';
 
 export interface NotificationDropdownProps {
   isOpen: boolean;
@@ -49,31 +49,31 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     switch (item.type) {
       case 'class':
         return (
-          <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shrink-0">
             <Dumbbell className="w-4 h-4" />
           </div>
         );
       case 'booking':
         return (
-          <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shrink-0">
             <Calendar className="w-4 h-4" />
           </div>
         );
       case 'discount':
         return (
-          <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center shrink-0">
             <Gift className="w-4 h-4" />
           </div>
         );
       case 'system':
         return (
-          <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center shrink-0">
             <Bell className="w-4 h-4" />
           </div>
         );
       default:
         return (
-          <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 flex items-center justify-center shrink-0">
             <Bell className="w-4 h-4" />
           </div>
         );
@@ -83,15 +83,15 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-800"
+      className="absolute right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200/90 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-slate-800"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
-        <h4 className="font-bold text-slate-800 text-sm">Thông báo</h4>
+        <h4 className="font-bold text-slate-900 text-sm tracking-tight">Thông báo</h4>
         <button
           type="button"
           onClick={onViewAll}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors cursor-pointer"
         >
           <span>Xem tất cả</span>
           <ArrowRight className="w-3 h-3" />
@@ -99,7 +99,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       </div>
 
       {/* Notifications List */}
-      <div className="max-h-80 overflow-y-auto divide-y divide-slate-50">
+      <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
         {notifications.map((item) => (
           <div
             key={item.id}
@@ -107,12 +107,15 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           >
             {renderIcon(item)}
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-slate-800 leading-snug">
+              <p className="text-xs font-bold text-slate-800 leading-snug">
                 {item.title}
               </p>
-              <p className="text-[11px] text-slate-500 mt-0.5 truncate">
+              <p className="text-[11px] text-slate-500 mt-0.5 truncate leading-tight">
                 {item.subtitle}
               </p>
+              <span className="text-[10px] text-slate-400 mt-1 block">
+                {item.time}
+              </span>
             </div>
             {item.isUnread && (
               <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1.5" />
@@ -126,9 +129,9 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         <button
           type="button"
           onClick={onViewAll}
-          className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+          className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors cursor-pointer"
         >
-          Xem tất cả
+          Đóng thông báo
         </button>
       </div>
     </div>
